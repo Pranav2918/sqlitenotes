@@ -16,10 +16,9 @@ class DBHelper {
   }
 
   initDatabase() async {
-    io.Directory documentDirectory = await getApplicationCacheDirectory();
+    io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentDirectory.path, "notes.db");
-    var db = await openDatabase(path,
-        version: 1, onCreate: (db, version) => _onCreate);
+    var db = await openDatabase(path, version: 1, onCreate: _onCreate);
     return db;
   }
 
@@ -30,7 +29,7 @@ class DBHelper {
 
   Future<NoteModel> insertNote(NoteModel noteModel) async {
     var dbClient = await db;
-    dbClient!.insert("notes", noteModel.toMap());
+    await dbClient!.insert("notes", noteModel.toMap());
     return noteModel;
   }
 
@@ -38,11 +37,7 @@ class DBHelper {
     var dbClient = await db;
     final List<Map<String, Object?>> queryResult =
         await dbClient!.query("notes");
-    return queryResult
-        .map(
-          (e) => NoteModel.fromMap(e),
-        )
-        .toList();
+    return queryResult.map((e) => NoteModel.fromMap(e)).toList();
   }
 
   Future<int> deleteNote(int id) async {

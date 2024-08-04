@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sqlitedemo/configs/routes/app_routes.dart';
+import 'package:sqlitedemo/data/db/db_helper.dart';
+import 'package:sqlitedemo/data/model/note_model.dart';
 
 class AddNotes extends StatefulWidget {
   const AddNotes({super.key});
@@ -8,8 +11,19 @@ class AddNotes extends StatefulWidget {
 }
 
 class _AddNotesState extends State<AddNotes> {
+  DBHelper? dbHelper;
   final TextEditingController _noteTitleController = TextEditingController();
-  final TextEditingController _noteDescriptionController = TextEditingController();
+  final TextEditingController _noteDescriptionController =
+      TextEditingController();
+
+  late Future<List<NoteModel>> notesList;
+
+  @override
+  void initState() {
+    dbHelper = DBHelper();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +70,33 @@ class _AddNotesState extends State<AddNotes> {
           ),
           Center(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                dbHelper!
+                    .insertNote(NoteModel(
+                        title: _noteTitleController.text,
+                        description: _noteDescriptionController.text))
+                    .then(
+                  (value) {
+                    setState(() {
+                      notesList = dbHelper!.getNotesList();
+                      Navigator.pushReplacementNamed(
+                          context, AppRoute.homeScreen);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Note added"),
+                        backgroundColor: Colors.amber,
+                      ));
+                    });
+                  },
+                ).onError(
+                  (error, stackTrace) {
+                    print(error);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Failed to add note"),
+                      backgroundColor: Colors.red,
+                    ));
+                  },
+                );
+              },
               style: ElevatedButton.styleFrom(
                   elevation: 5.0,
                   shape: RoundedRectangleBorder(
