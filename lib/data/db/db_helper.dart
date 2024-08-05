@@ -24,7 +24,7 @@ class DBHelper {
 
   _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE notes(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, description TEXT NOT NULL)");
+        "CREATE TABLE notes(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, createdAt TEXT NOT NULL)");
   }
 
   Future<NoteModel> insertNote(NoteModel noteModel) async {
@@ -43,11 +43,5 @@ class DBHelper {
   Future<int> deleteNote(int id) async {
     var dbClient = await db;
     return await dbClient!.delete("notes", where: "id = ?", whereArgs: [id]);
-  }
-
-  Future<int> editNote(NoteModel noteModel) async {
-    var dbClient = await db;
-    return await dbClient!.update("notes", noteModel.toMap(),
-        where: "id = ?", whereArgs: [noteModel.id]);
   }
 }

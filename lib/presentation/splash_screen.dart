@@ -11,20 +11,18 @@ class SplashScreen extends StatefulWidget {
 class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Future.delayed(const Duration(seconds: 2)).then((value) {
+    Future.delayed(const Duration(seconds: 1)).then((value) {
       debugPrint("Navigated");
-      Navigator.pushNamed(context, AppRoute.homeScreen);
+      Navigator.pushReplacementNamed(context, AppRoute.homeScreen);
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: FlutterLogo(
-          size: 150.0,
-        ),
+        child: Image.asset("assets/splash.png")
       ),
     );
   }

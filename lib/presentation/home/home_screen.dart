@@ -11,8 +11,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isSearchEnable = false;
-  final TextEditingController _searchController = TextEditingController();
   late Future<List<NoteModel>> noteList;
   DBHelper? dbHelper;
 
@@ -30,41 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _isSearchEnable
-          ? AppBar(
-              title: TextFormField(
-                controller: _searchController,
-                style: const TextStyle(
-                    fontSize: 15.0, fontWeight: FontWeight.normal),
-                decoration: const InputDecoration(
-                    counterText: "",
-                    border: InputBorder.none,
-                    hintText: "Search",
-                    hintStyle: TextStyle(
-                        fontSize: 15.0, fontWeight: FontWeight.normal)),
-              ),
-              leading: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _searchController.text = "";
-                      _isSearchEnable = false;
-                    });
-                  },
-                  icon: const Icon(Icons.close)),
-            )
-          : AppBar(
-              automaticallyImplyLeading: false,
-              title: const Text("Home"),
-              actions: [
-                IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isSearchEnable = true;
-                      });
-                    },
-                    icon: const Icon(Icons.search))
-              ],
-            ),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text("Home"),
+      ),
       body: _renderNotesHomeScreenUI(),
       floatingActionButton: _showAddButton(),
     );
@@ -83,47 +50,40 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text("Something went wrong"),
           );
         } else {
-          return ListView.builder(
-            itemCount: snapshot.data?.length ?? 0,
-            itemBuilder: (context, noteIndex) {
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Center(
-                    child: Text(snapshot.data![noteIndex].id.toString()),
+          return snapshot.data!.isEmpty
+              ? const Center(
+                  child: Text(
+                    "Nothing here...",
+                    style: TextStyle(fontSize: 15.0),
                   ),
-                ),
-                title: Text(snapshot.data![noteIndex].title),
-                subtitle: Text(snapshot.data![noteIndex].description),
-                trailing: PopupMenuButton(
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                        child: ListTile(
-                      leading: Icon(
-                        Icons.edit,
-                        color: Colors.blue,
+                )
+              : ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: snapshot.data?.length ?? 0,
+                  itemBuilder: (context, noteIndex) {
+                    return ListTile(
+                      onTap: () {},
+                      leading: const CircleAvatar(
+                        child: Center(
+                            child: Icon(
+                          Icons.stars,
+                          color: Colors.white,
+                        )),
                       ),
-                      title: Text("Edit"),
-                    )),
-                    PopupMenuItem(
-                        onTap: () {
-                          dbHelper?.deleteNote(snapshot.data![noteIndex].id!);
-                          setState(() {
-                            noteList = dbHelper!.getNotesList();
-                            snapshot.data!.remove(snapshot.data![noteIndex]);
-                          });
-                        },
-                        child: const ListTile(
-                          leading: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          title: Text("Delete"),
-                        ))
-                  ],
-                ),
-              );
-            },
-          );
+                      title: Text(snapshot.data![noteIndex].title),
+                      subtitle: Text(snapshot.data![noteIndex].createdAt),
+                      trailing: IconButton(
+                          onPressed: () {
+                            dbHelper?.deleteNote(snapshot.data![noteIndex].id!);
+                            setState(() {
+                              noteList = dbHelper!.getNotesList();
+                              snapshot.data!.remove(snapshot.data![noteIndex]);
+                            });
+                          },
+                          icon: const Icon(Icons.delete_outlined)),
+                    );
+                  },
+                );
         }
       },
     );
@@ -131,8 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   FloatingActionButton _showAddButton() {
     return FloatingActionButton(
+      elevation: 5.0,
       onPressed: () {
-        Navigator.pushNamed(context, AppRoute.addNotes);
+        Navigator.pushReplacementNamed(context, AppRoute.addNotes);
       },
       child: const Center(
         child: Icon(Icons.add),
