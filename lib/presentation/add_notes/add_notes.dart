@@ -43,7 +43,6 @@ class _AddNotesState extends State<AddNotes> {
               children: [
                 TextFormField(
                   controller: _noteTitleController,
-                  maxLength: 50,
                   maxLines: 3,
                   style: const TextStyle(
                       fontSize: 17.0, fontWeight: FontWeight.bold),
