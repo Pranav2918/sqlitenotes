@@ -27,14 +27,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text("Home"),
-      ),
-      body: _renderNotesHomeScreenUI(),
-      floatingActionButton: _showAddButton(),
-    );
+    return PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text("Home"),
+          ),
+          body: _renderNotesHomeScreenUI(),
+          floatingActionButton: _showAddButton(),
+        ));
   }
 
   Widget _renderNotesHomeScreenUI() {
@@ -93,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return FloatingActionButton(
       elevation: 5.0,
       onPressed: () {
-        Navigator.pushReplacementNamed(context, AppRoute.addNotes);
+        Navigator.pushNamed(context, AppRoute.addNotes);
       },
       child: const Center(
         child: Icon(Icons.add),
